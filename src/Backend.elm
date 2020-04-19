@@ -2,6 +2,7 @@ module Backend exposing (..)
 
 import Html
 import Lamdera exposing (ClientId, SessionId, sendToFrontend)
+import Set exposing (Set)
 import Types exposing (..)
 
 
@@ -20,7 +21,10 @@ app =
 
 init : ( Model, Cmd BackendMsg )
 init =
-    ( { message = "Hello!", travels = [] }
+    ( { message = "Hello!"
+      , clients = Set.empty
+      , travels = [ Travel 1 "Seville" [ Container (ContainerMsg 1 False "Sac à dos" [ Content (Object 1 "Iphone" JustBefore) ]) ] ]
+      }
     , Cmd.none
     )
 
@@ -38,5 +42,17 @@ updateFromFrontend sessionId clientId msg model =
         NoOpToBackend ->
             ( model, Cmd.none )
 
+        ClientJoin ->
+            ( { model | clients = Set.insert clientId model.clients }
+            , sendToFrontend clientId (UpdateTravelsFromBackend model.travels clientId)
+            )
+
         ToBackendToggleContainer travels ->
-            ( { model | travels = travels }, sendToFrontend clientId (UpdateTravelsFromBackend travels) )
+            ( { model | travels = travels }, broadcast model.clients (UpdateTravelsFromBackend travels clientId) )
+
+
+broadcast clients msg =
+    clients
+        |> Set.toList
+        |> List.map (\clientId -> sendToFrontend clientId msg)
+        |> Cmd.batch

@@ -2,11 +2,14 @@ module Types exposing (..)
 
 import Browser exposing (UrlRequest)
 import Browser.Navigation exposing (Key)
+import Lamdera exposing (ClientId, SessionId, sendToFrontend)
+import Set exposing (Set)
 import Url exposing (Url)
 
 
 type alias FrontendModel =
     { key : Key
+    , clientId : String
     , travels : List Travel
     }
 
@@ -63,6 +66,7 @@ type alias TravelId =
 
 type alias BackendModel =
     { message : String
+    , clients : Set ClientId
     , travels : List Travel
     }
 
@@ -76,6 +80,7 @@ type FrontendMsg
 
 type ToBackend
     = NoOpToBackend
+    | ClientJoin
     | ToBackendToggleContainer (List Travel)
 
 
@@ -84,4 +89,4 @@ type BackendMsg
 
 
 type ToFrontend
-    = UpdateTravelsFromBackend (List Travel)
+    = UpdateTravelsFromBackend (List Travel) String

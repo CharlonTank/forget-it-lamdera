@@ -5,8 +5,9 @@ import Browser.Navigation as Nav
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
-import Lamdera
+import Lamdera exposing (sendToBackend)
 import List.Extra
+import Set exposing (Set)
 import Types exposing (..)
 import Url
 
@@ -29,8 +30,11 @@ app =
 
 init : Url.Url -> Nav.Key -> ( Model, Cmd FrontendMsg )
 init url key =
-    ( { key = key, travels = [ Travel 1 "Seville" [ Container (ContainerMsg 1 False "Sac à dos" [ Content (Object 1 "Iphone" JustBefore) ]) ] ] }
-    , Cmd.none
+    ( { key = key
+      , clientId = ""
+      , travels = [ Travel 1 "Seville" [ Container (ContainerMsg 1 False "Sac à dos" [ Content (Object 1 "Iphone" JustBefore) ]) ] ]
+      }
+    , sendToBackend ClientJoin
     )
 
 
@@ -101,8 +105,8 @@ toggleContainer containerId travel =
 updateFromBackend : ToFrontend -> Model -> ( Model, Cmd FrontendMsg )
 updateFromBackend msg model =
     case msg of
-        UpdateTravelsFromBackend travels ->
-            ( { model | travels = travels }, Cmd.none )
+        UpdateTravelsFromBackend travels clientId ->
+            ( { model | travels = travels, clientId = clientId }, Cmd.none )
 
 
 
@@ -114,7 +118,8 @@ view : Model -> Browser.Document FrontendMsg
 view model =
     { title = "Forget-it!"
     , body =
-        [ h1 [] [ text "Travels" ]
+        [ h1 [] [ text <| "clientId = " ++ model.clientId ]
+        , h1 [] [ text "Travels" ]
         , showTravels model.travels
         ]
     }
