@@ -1,9 +1,0 @@
-FrontendModel includes:
-
-- Browser.Navigation.Key (elm/browser)
-
-FrontendMsg includes:
-
-- Url.Protocol (elm/url)
-- Browser.UrlRequest (elm/browser)
-

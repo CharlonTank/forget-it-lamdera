@@ -1,7 +1,7 @@
 module Backend exposing (..)
 
 import Html
-import Lamdera exposing (ClientId, SessionId)
+import Lamdera exposing (ClientId, SessionId, sendToFrontend)
 import Types exposing (..)
 
 
@@ -20,7 +20,7 @@ app =
 
 init : ( Model, Cmd BackendMsg )
 init =
-    ( { message = "Hello!" }
+    ( { message = "Hello!", travels = [] }
     , Cmd.none
     )
 
@@ -37,3 +37,6 @@ updateFromFrontend sessionId clientId msg model =
     case msg of
         NoOpToBackend ->
             ( model, Cmd.none )
+
+        ToBackendToggleContainer travels ->
+            ( { model | travels = travels }, sendToFrontend clientId (UpdateTravelsFromBackend travels))
