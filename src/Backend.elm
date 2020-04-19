@@ -39,4 +39,4 @@ updateFromFrontend sessionId clientId msg model =
             ( model, Cmd.none )
 
         ToBackendToggleContainer travels ->
-            ( { model | travels = travels }, sendToFrontend clientId (UpdateTravelsFromBackend travels))
+            ( { model | travels = travels }, sendToFrontend clientId (UpdateTravelsFromBackend travels) )

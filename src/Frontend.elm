@@ -6,9 +6,9 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Lamdera
+import List.Extra
 import Types exposing (..)
 import Url
-import List.Extra
 
 
 type alias Model =
@@ -58,12 +58,18 @@ update msg model =
         ToggleContainer travelId containerId ->
             toggleTravelContainer travelId containerId model
 
+
 toggleTravelContainer : TravelId -> ContainerId -> Model -> ( Model, Cmd FrontendMsg )
 toggleTravelContainer travelId containerId model =
-    let travels = (List.Extra.updateIf (\travel -> travel.id == travelId) (toggleContainer containerId) model.travels)
+    let
+        travels =
+            List.Extra.updateIf (\travel -> travel.id == travelId) (toggleContainer containerId) model.travels
     in
-    (model, (Lamdera.sendToBackend ) (ToBackendToggleContainer travels) )
-    -- ({model | travels = (List.Extra.updateIf (\travel -> travel.id == travelId) (toggleContainer containerId) model.travels)}, (Lamdera.sendToBackend ) (ToBackendToggleContainer travels) )
+    ( model, Lamdera.sendToBackend (ToBackendToggleContainer travels) )
+
+
+
+-- ({model | travels = (List.Extra.updateIf (\travel -> travel.id == travelId) (toggleContainer containerId) model.travels)}, (Lamdera.sendToBackend ) (ToBackendToggleContainer travels) )
 
 
 toggleContainer : ContainerId -> Travel -> Travel
@@ -92,15 +98,16 @@ toggleContainer containerId travel =
     { travel | items = newItems }
 
 
-
-
 updateFromBackend : ToFrontend -> Model -> ( Model, Cmd FrontendMsg )
 updateFromBackend msg model =
     case msg of
         UpdateTravelsFromBackend travels ->
-            ( {model | travels = travels}, Cmd.none )
-        -- _ ->
-        --     (model, Cmd.none)
+            ( { model | travels = travels }, Cmd.none )
+
+
+
+-- _ ->
+--     (model, Cmd.none)
 
 
 view : Model -> Browser.Document FrontendMsg
@@ -142,14 +149,14 @@ showContainer : TravelId -> ContainerMsg -> Html FrontendMsg
 showContainer travelId container =
     div [ onClick <| ToggleContainer travelId container.id ]
         (h2 [] [ text container.name ]
-            :: (case container.opened of
-                    True ->
-                        List.map (showItem travelId) container.items
+            :: (if container.opened then
+                    List.map (showItem travelId) container.items
 
-                    False ->
-                        []
+                else
+                    []
                )
         )
+
 
 showContent : Object -> Html FrontendMsg
 showContent object =
