@@ -89,4 +89,5 @@ type BackendMsg
 
 
 type ToFrontend
-    = UpdateTravelsFromBackend (List Travel) String
+    = NoOpToFrontend
+    | UpdateTravelsFromBackend (List Travel) String

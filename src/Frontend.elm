@@ -108,6 +108,9 @@ updateFromBackend msg model =
         UpdateTravelsFromBackend travels clientId ->
             ( { model | travels = travels, clientId = clientId }, Cmd.none )
 
+        NoOpToFrontend ->
+            ( model, Cmd.none )
+
 
 
 -- _ ->
